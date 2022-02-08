@@ -14,4 +14,5 @@ go get && go build .
 ```
 
 ## TODO
-* Build an actual UI using gocui
+* Improve UI
+* Properly disconnect Socket
