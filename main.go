@@ -22,6 +22,10 @@ type SocketRes struct {
 	D  json.RawMessage
 }
 
+type SendData struct {
+	Op int64 `json:"op"`
+}
+
 type HeartbeatData struct {
 	Message   string `json:"message"`
 	Heartbeat int64  `json:"heartbeat"`
@@ -53,21 +57,22 @@ type Album struct {
 }
 
 func sendHeartBeat(socket gowebsocket.Socket) {
-	socket.SendText("{ op: 9 }")
+	data := SendData{
+		Op: 9,
+	}
+	data_str, _ := json.Marshal(data)
+
+	socket.SendText(string(data_str))
 }
 
 func setHeartbeat(socket gowebsocket.Socket, repeat int64) {
 	sendHeartBeat(socket)
 	ticker := time.NewTicker(time.Duration(repeat) * time.Millisecond)
-	quit := make(chan struct{})
 	go func() {
 		for {
 			select {
 			case <-ticker.C:
 				sendHeartBeat(socket)
-			case <-quit:
-				ticker.Stop()
-				return
 			}
 		}
 	}()
@@ -94,9 +99,6 @@ func handleMessage(msg_str string, socket gowebsocket.Socket) {
 }
 
 func main() {
-	interrupt := make(chan os.Signal, 1)
-	signal.Notify(interrupt, os.Interrupt)
-
 	mode := "jpop"
 	var STREAM_URL string
 	var SOCKET_URL string
@@ -126,15 +128,15 @@ func main() {
 		fmt.Println("Recieved connect error ", err)
 	}
 	socket.OnTextMessage = handleMessage
-	socket.OnDisconnected = func(err error, socket gowebsocket.Socket) {
-		fmt.Println(err)
-	}
 	socket.Connect()
 
 	// Player
 	fmt.Println("Starting player")
 	player := exec.Command("mplayer", STREAM_URL)
 	player.Start()
+
+	interrupt := make(chan os.Signal, 1)
+	signal.Notify(interrupt, os.Interrupt)
 	for {
 		select {
 		case <-interrupt:
