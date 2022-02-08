@@ -69,12 +69,8 @@ func setHeartbeat(socket gowebsocket.Socket, repeat int64) {
 	sendHeartBeat(socket)
 	ticker := time.NewTicker(time.Duration(repeat) * time.Millisecond)
 	go func() {
-		for {
-			select {
-			case <-ticker.C:
-				sendHeartBeat(socket)
-			}
-		}
+		<-ticker.C
+		sendHeartBeat(socket)
 	}()
 }
 
@@ -137,12 +133,6 @@ func main() {
 
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
-	for {
-		select {
-		case <-interrupt:
-			fmt.Println("Exiting...")
-			socket.Close()
-			return
-		}
-	}
+	<-interrupt
+	socket.Close()
 }
