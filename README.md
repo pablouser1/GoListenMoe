@@ -2,8 +2,6 @@
 Cross platform Listen.moe client made using Go
 
 ## Installation
-This project depends on mplayer for playing audio
-
 ```bash
 go get && go build .
 ```
