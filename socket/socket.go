@@ -2,38 +2,37 @@ package socket
 
 import (
 	"encoding/json"
-	"fmt"
+	"log"
 	"time"
 
+	"github.com/gorilla/websocket"
 	"github.com/pablouser1/GoListenMoe/model"
 	"github.com/pablouser1/GoListenMoe/viewer"
-	"github.com/sacOO7/gowebsocket"
 )
 
-var socket gowebsocket.Socket
+var conn *websocket.Conn
+var done = false
+var ticker *time.Ticker
 
 func sendHeartBeat() {
 	data := model.SendData{
 		Op: 9,
 	}
-	data_bytes, _ := json.Marshal(data)
-
-	socket.SendBinary(data_bytes)
+	conn.WriteJSON(data)
 }
 
 func setHeartbeat(repeat int64) {
 	sendHeartBeat()
-	ticker := time.NewTicker(time.Duration(repeat) * time.Millisecond)
+	ticker = time.NewTicker(time.Duration(repeat) * time.Millisecond)
 	go func() {
 		<-ticker.C
 		sendHeartBeat()
 	}()
 }
 
-func handleMessage(msg_str string, _ gowebsocket.Socket) {
+func handleMessage(in []byte) {
 	var msg model.SocketRes
-	msg_bytes := []byte(msg_str)
-	json.Unmarshal(msg_bytes, &msg)
+	json.Unmarshal(in, &msg)
 	switch msg.Op {
 	case 0:
 		var data model.HeartbeatData
@@ -51,23 +50,29 @@ func handleMessage(msg_str string, _ gowebsocket.Socket) {
 }
 
 func Start(url string) {
-	socket = gowebsocket.New(url)
-	socket.OnConnected = func(_ gowebsocket.Socket) {
-		fmt.Println("Connected to server")
+	conn_l, _, err := websocket.DefaultDialer.Dial(url, nil)
+	if err != nil {
+		log.Fatal("Couldn't connect to websocket")
 	}
-	socket.OnConnectError = func(err error, _ gowebsocket.Socket) {
-		fmt.Println("Recieved connect error ", err)
-	}
-	socket.OnTextMessage = handleMessage
-	socket.OnDisconnected = func(err error, _ gowebsocket.Socket) {
-		fmt.Printf("Disconnected from socket")
-		if err != nil {
-			fmt.Println(err)
+	conn = conn_l
+
+	go func() {
+		for {
+			if done {
+				conn.Close()
+				break
+			}
+			_, msg, err := conn.ReadMessage()
+			if err != nil {
+				log.Fatal("Couldn't read websocket message")
+			}
+
+			handleMessage(msg)
 		}
-	}
-	socket.Connect()
+	}()
 }
 
 func Stop() {
-	socket.Close()
+	done = true
+	ticker.Stop()
 }

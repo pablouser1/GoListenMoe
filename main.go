@@ -3,19 +3,21 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/signal"
 
 	"github.com/pablouser1/GoListenMoe/player"
 	"github.com/pablouser1/GoListenMoe/socket"
-	"github.com/pablouser1/GoListenMoe/viewer"
 )
 
-const JPOP_STEAM string = "https://listen.moe/stream"
-const KPOP_STEAM string = "https://listen.moe/kpop/stream"
+const JPOP_STEAM string = "https://listen.moe/fallback"
+const KPOP_STEAM string = "https://listen.moe/kpop/fallback"
 
 const JPOP_SOCKET string = "wss://listen.moe/gateway_v2"
 const KPOP_SOCKET string = "wss://listen.moe/kpop/gateway_v2"
 
 func main() {
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
 	mode := "jpop"
 	var STREAM_URL string
 	var SOCKET_URL string
@@ -38,12 +40,13 @@ func main() {
 		os.Exit(1)
 	}
 
-	player.Start(STREAM_URL)
 	socket.Start(SOCKET_URL)
-	viewer.Init()
-	// This will block the thread
-	viewer.Poll()
+	player.Start(STREAM_URL)
 	// After user exists close everything
-	socket.Stop()
+	interrupt := make(chan os.Signal, 1)
+	signal.Notify(interrupt, os.Interrupt)
+	<-interrupt
+	fmt.Println("Exiting...")
 	player.Stop()
+	socket.Stop()
 }

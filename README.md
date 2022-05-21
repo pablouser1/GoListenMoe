@@ -1,5 +1,5 @@
 # Go Listen.moe
-Listen.moe client made using Go
+Cross platform Listen.moe client made using Go
 
 ## Installation
 This project depends on mplayer for playing audio
@@ -15,4 +15,7 @@ go get && go build .
 
 ## TODO
 * Improve UI
-* Properly disconnect Socket
+
+## External libraries used
+* Beep (https://github.com/faiface/beep)
+* Gorilla websocket (github.com/gorilla/websocket)
