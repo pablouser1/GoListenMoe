@@ -73,6 +73,6 @@ func Start(url string) {
 }
 
 func Stop() {
-	done = true
 	ticker.Stop()
+	done = true
 }

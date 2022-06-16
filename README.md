@@ -16,4 +16,4 @@ go get && go build .
 
 ## External libraries used
 * Beep (https://github.com/faiface/beep)
-* Gorilla websocket (github.com/gorilla/websocket)
+* Gorilla websocket (https://github.com/gorilla/websocket)
