@@ -43,11 +43,7 @@ func handleMessage(in []byte) {
 	case 1:
 		var data model.PlayingData
 		json.Unmarshal(msg.D, &data)
-		album := "None"
-		if len(data.Song.Albums) > 0 {
-			album = data.Song.Albums[0].Name
-		}
-		viewer.WriteToScreen(data.Song.Title, data.Song.Artists[0].Name, album)
+		viewer.WriteToScreen(data.Song, data.LastPlayed[0], data.Listeners, data.StartTime)
 	}
 }
 

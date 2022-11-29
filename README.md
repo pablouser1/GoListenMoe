@@ -8,11 +8,14 @@ go get && go build .
 
 ## How to use
 ```bash
-./GoListenMoe jpop # (or kpop)
+./GoListenMoe jpop --fallback # (or kpop)
 ```
 
 ## TODO
 * Improve UI
+* Play Vorbis correctly (right now using fallback stream)
+* Hot-swapping between JPop and Kpop
+* Tidy code
 
 ## External libraries used
 * Beep (https://github.com/faiface/beep)
