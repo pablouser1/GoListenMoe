@@ -16,8 +16,6 @@ const JPOP_SOCKET string = "wss://listen.moe/gateway_v2"
 const KPOP_SOCKET string = "wss://listen.moe/kpop/gateway_v2"
 
 func main() {
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt)
 	mode := "jpop"
 	var STREAM_URL string
 	var SOCKET_URL string

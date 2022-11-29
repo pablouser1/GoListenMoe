@@ -1,10 +1,10 @@
 module github.com/pablouser1/GoListenMoe
 
-go 1.18
+go 1.19
 
 require (
 	github.com/faiface/beep v1.1.0
-	github.com/gorilla/websocket v1.4.2
+	github.com/gorilla/websocket v1.5.0
 )
 
 require (

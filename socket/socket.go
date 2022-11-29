@@ -25,8 +25,10 @@ func setHeartbeat(repeat int64) {
 	sendHeartBeat()
 	ticker = time.NewTicker(time.Duration(repeat) * time.Millisecond)
 	go func() {
-		<-ticker.C
-		sendHeartBeat()
+		for !done {
+			<-ticker.C
+			sendHeartBeat()
+		}
 	}()
 }
 
@@ -64,9 +66,8 @@ func Start(url string) {
 			}
 			_, msg, err := conn.ReadMessage()
 			if err != nil {
-				log.Fatal("Couldn't read websocket message")
+				log.Panic("Couldn't read WebSocket message")
 			}
-
 			handleMessage(msg)
 		}
 	}()
