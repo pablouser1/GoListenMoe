@@ -8,8 +8,10 @@ go get && go build .
 
 ## How to use
 ```bash
-./GoListenMoe jpop --fallback # (or kpop)
+./GoListenMoe -f jpop # (or kpop)
 ```
+
+* -f: Forces fallback mode, currently required to work
 
 ## TODO
 * Improve UI

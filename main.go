@@ -1,23 +1,25 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"os/signal"
 
 	"github.com/pablouser1/GoListenMoe/player"
 	"github.com/pablouser1/GoListenMoe/socket"
-	"github.com/urfave/cli/v2"
 )
 
-const JPOP_STEAM string = "https://listen.moe/stream"
-const KPOP_STEAM string = "https://listen.moe/kpop/stream"
+type Stream struct {
+	standard string
+	fallback string
+	socket   string
+}
 
-const JPOP_FALLBACK_STEAM string = "https://listen.moe/fallback"
-const KPOP_FALLBACK_STEAM string = "https://listen.moe/kpop/fallback"
-
-const JPOP_SOCKET string = "wss://listen.moe/gateway_v2"
-const KPOP_SOCKET string = "wss://listen.moe/kpop/gateway_v2"
+type FinalStream struct {
+	stream string
+	socket string
+}
 
 func loop() {
 	// After user exists close everything
@@ -29,59 +31,49 @@ func loop() {
 	socket.Stop()
 }
 
+func streamPicker(genre string, fallback bool) FinalStream {
+	jpop := Stream{
+		standard: "https://listen.moe/stream",
+		fallback: "https://listen.moe/fallback",
+		socket:   "wss://listen.moe/gateway_v2",
+	}
+
+	kpop := Stream{
+		standard: "https://listen.moe/kpop/stream",
+		fallback: "https://listen.moe/kpop/fallback",
+		socket:   "wss://listen.moe/kpop/gateway_v2",
+	}
+
+	pickedStream := kpop
+	if genre == "jpop" || genre == "j" {
+		pickedStream = jpop
+	}
+
+	stream := pickedStream.standard
+	if fallback {
+		stream = pickedStream.fallback
+	}
+
+	return FinalStream{
+		stream: stream,
+		socket: pickedStream.socket,
+	}
+
+}
+
 func main() {
-	flags := []cli.Flag{
-		&cli.BoolFlag{
-			Name:    "fallback",
-			Aliases: []string{"f"},
-			Usage:   "Use MP3 stream",
-			Value:   false,
-		},
+	fallback := flag.Bool("f", false, "Use fallback MP3")
+	flag.Parse()
+
+	genre := "jpop"
+
+	if len(flag.Args()) > 0 {
+		genre = flag.Args()[0]
 	}
 
-	app := &cli.App{
-		Name: "GoListenMoe",
-		Commands: []*cli.Command{
-			{
-				Name:    "jpop",
-				Aliases: []string{"j"},
-				Usage:   "Listen to J-Pop",
-				Action: func(cCtx *cli.Context) error {
-					var STREAM_URL string
-					if cCtx.Bool("fallback") {
-						STREAM_URL = JPOP_FALLBACK_STEAM
-					} else {
-						STREAM_URL = JPOP_STEAM
-					}
-					socket.Start(JPOP_SOCKET)
-					player.Start(STREAM_URL, cCtx.Bool("fallback"))
-					loop()
-					return nil
-				},
-				Flags: flags,
-			},
-			{
-				Name:    "kpop",
-				Aliases: []string{"k"},
-				Usage:   "Listen to K-Pop",
-				Action: func(cCtx *cli.Context) error {
-					var STREAM_URL string
-					if cCtx.Bool("fallback") {
-						STREAM_URL = KPOP_FALLBACK_STEAM
-					} else {
-						STREAM_URL = KPOP_STEAM
-					}
-					socket.Start(KPOP_SOCKET)
-					player.Start(STREAM_URL, cCtx.Bool("fallback"))
-					loop()
-					return nil
-				},
-				Flags: flags,
-			},
-		},
-	}
+	streaming := streamPicker(genre, *fallback)
 
-	if err := app.Run(os.Args); err != nil {
-		panic(err)
-	}
+	socket.Start(streaming.socket)
+	player.Start(streaming.stream, *fallback)
+	loop()
 }
