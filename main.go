@@ -16,11 +16,6 @@ type Stream struct {
 	socket   string
 }
 
-type FinalStream struct {
-	stream string
-	socket string
-}
-
 func loop() {
 	// After user exists close everything
 	interrupt := make(chan os.Signal, 1)
@@ -31,7 +26,7 @@ func loop() {
 	socket.Stop()
 }
 
-func streamPicker(genre string, fallback bool) FinalStream {
+func streamPicker(genre string, fallback bool) (string, string) {
 	jpop := Stream{
 		standard: "https://listen.moe/stream",
 		fallback: "https://listen.moe/fallback",
@@ -54,10 +49,7 @@ func streamPicker(genre string, fallback bool) FinalStream {
 		stream = pickedStream.fallback
 	}
 
-	return FinalStream{
-		stream: stream,
-		socket: pickedStream.socket,
-	}
+	return stream, pickedStream.socket
 
 }
 
@@ -71,9 +63,9 @@ func main() {
 		genre = flag.Args()[0]
 	}
 
-	streaming := streamPicker(genre, *fallback)
+	streamUrl, socketUrl := streamPicker(genre, *fallback)
 
-	socket.Start(streaming.socket)
-	player.Start(streaming.stream, *fallback)
+	socket.Start(streamUrl)
+	player.Start(socketUrl, *fallback)
 	loop()
 }
