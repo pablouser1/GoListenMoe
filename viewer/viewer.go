@@ -6,10 +6,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/pablouser1/GoListenMoe/model"
+	"github.com/pablouser1/GoListenMoe/models"
 )
 
-func showAlbum(albums []model.Album) string {
+func showAlbum(albums []models.Album) string {
 	album := "None"
 	if len(albums) > 0 {
 		album = albums[0].Name
@@ -17,7 +17,7 @@ func showAlbum(albums []model.Album) string {
 	return "Album: " + album
 }
 
-func WriteToScreen(now model.Song, last model.Song, listeners int64, start string) {
+func WriteToScreen(now models.Song, last models.Song, listeners int64, start string) {
 	fmt.Print("\033[H\033[2J") // Clear screen
 	parseStart, err := time.Parse(time.RFC3339, start)
 	if err != nil {

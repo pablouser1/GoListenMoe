@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
-	"github.com/pablouser1/GoListenMoe/model"
+	"github.com/pablouser1/GoListenMoe/models"
 	"github.com/pablouser1/GoListenMoe/viewer"
 )
 
@@ -15,7 +15,7 @@ var done = false
 var ticker *time.Ticker
 
 func sendHeartBeat() {
-	data := model.SendData{
+	data := models.SendData{
 		Op: 9,
 	}
 	conn.WriteJSON(data)
@@ -33,15 +33,15 @@ func setHeartbeat(repeat int64) {
 }
 
 func handleMessage(in []byte) {
-	var msg model.SocketRes
+	var msg models.SocketRes
 	json.Unmarshal(in, &msg)
 	switch msg.Op {
 	case 0:
-		var data model.HeartbeatData
+		var data models.HeartbeatData
 		json.Unmarshal(msg.D, &data)
 		setHeartbeat(data.Heartbeat)
 	case 1:
-		var data model.PlayingData
+		var data models.PlayingData
 		json.Unmarshal(msg.D, &data)
 		viewer.WriteToScreen(data.Song, data.LastPlayed[0], data.Listeners, data.StartTime)
 	}
@@ -50,7 +50,7 @@ func handleMessage(in []byte) {
 func Start(url string) {
 	conn_l, _, err := websocket.DefaultDialer.Dial(url, nil)
 	if err != nil {
-		log.Fatal("Couldn't connect to websocket")
+		log.Fatal("Couldn't connect to websocket", err)
 	}
 	conn = conn_l
 
@@ -62,7 +62,7 @@ func Start(url string) {
 			}
 			_, msg, err := conn.ReadMessage()
 			if err != nil {
-				log.Panic("Couldn't read WebSocket message")
+				log.Panic("Couldn't read WebSocket message", err)
 			}
 			handleMessage(msg)
 		}

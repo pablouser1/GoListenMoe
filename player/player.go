@@ -16,7 +16,7 @@ var streamer beep.StreamSeekCloser
 func Start(url string, fallback bool) {
 	resp, err := http.Get(url)
 	if err != nil {
-		log.Fatal("Error sending HTTP request")
+		log.Fatal("Error sending HTTP request", err)
 	}
 
 	var format beep.Format
@@ -29,7 +29,7 @@ func Start(url string, fallback bool) {
 	}
 
 	if err != nil {
-		log.Fatal("Error decoding")
+		log.Fatal("Error decoding", err)
 	}
 
 	speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
