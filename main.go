@@ -65,7 +65,7 @@ func main() {
 
 	streamUrl, socketUrl := streamPicker(genre, *fallback)
 
-	socket.Start(streamUrl)
-	player.Start(socketUrl, *fallback)
+	socket.Start(socketUrl)
+	player.Start(streamUrl, *fallback)
 	loop()
 }
