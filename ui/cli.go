@@ -1,8 +1,10 @@
-package viewer
+package ui
 
 import (
 	"fmt"
 	"math"
+	"os"
+	"os/signal"
 	"strconv"
 	"time"
 
@@ -45,4 +47,18 @@ func WriteToScreen(now models.Song, last models.Song, listeners int64, start str
 
 	// Misc
 	fmt.Println("Listeners: " + strconv.FormatInt(listeners, 10))
+}
+
+func Cli(playing chan models.PlayingData) {
+	interrupt := make(chan os.Signal, 1)
+	signal.Notify(interrupt, os.Interrupt)
+
+	go func() {
+		for {
+			now := <-playing
+			WriteToScreen(now.Song, now.LastPlayed[0], now.Listeners, now.StartTime)
+		}
+	}()
+
+	<-interrupt
 }

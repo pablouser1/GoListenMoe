@@ -1,10 +1,10 @@
 module github.com/pablouser1/GoListenMoe
 
-go 1.21.2
+go 1.21.5
 
 require (
-	github.com/gopxl/beep v1.2.0
-	github.com/gorilla/websocket v1.5.0
+	github.com/gopxl/beep v1.3.0
+	github.com/gorilla/websocket v1.5.1
 )
 
 require (
@@ -14,5 +14,6 @@ require (
 	github.com/jfreymuth/oggvorbis v1.0.5 // indirect
 	github.com/jfreymuth/vorbis v1.0.2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	golang.org/x/sys v0.12.0 // indirect
+	golang.org/x/net v0.19.0 // indirect
+	golang.org/x/sys v0.15.0 // indirect
 )
