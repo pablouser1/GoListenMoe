@@ -20,7 +20,12 @@ func main() {
 		genreStr = flag.Args()[0]
 	}
 
-	genre := helpers.GetGenreById(genreStr)
+	genre, err := helpers.GetGenreById(genreStr)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	playing, err := socket.Start(genre.Socket)
 

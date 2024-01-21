@@ -2,24 +2,22 @@ package helpers
 
 import (
 	"fmt"
-	"os"
 
-	"github.com/pablouser1/GoListenMoe/constants"
+	"github.com/pablouser1/GoListenMoe/constants/genres"
 	"github.com/pablouser1/GoListenMoe/models"
 )
 
-func GetGenreById(genreStr string) models.Genre {
+func GetGenreById(genreStr string) (models.Genre, error) {
 	var genre models.Genre
 
 	switch genreStr {
 	case "jpop", "j":
-		genre = constants.JPOP_GENRE
+		genre = genres.JPOP
 	case "kpop", "k":
-		genre = constants.KPOP_GENRE
+		genre = genres.KPOP
 	default:
-		fmt.Println("Genre not available!")
-		os.Exit(1)
+		return models.Genre{}, fmt.Errorf("genre not available")
 	}
 
-	return genre
+	return genre, nil
 }
