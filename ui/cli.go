@@ -19,7 +19,7 @@ func showAlbum(albums []models.Album) string {
 	return "Album: " + album
 }
 
-func WriteToScreen(now models.Song, last models.Song, listeners int64, start string) {
+func writeToScreen(now models.Song, last models.Song, listeners int64, start string) {
 	fmt.Print("\033[H\033[2J") // Clear screen
 	parseStart, err := time.Parse(time.RFC3339, start)
 	if err != nil {
@@ -56,7 +56,7 @@ func Cli(playing chan models.PlayingData) {
 	go func() {
 		for {
 			now := <-playing
-			WriteToScreen(now.Song, now.LastPlayed[0], now.Listeners, now.StartTime)
+			writeToScreen(now.Song, now.LastPlayed[0], now.Listeners, now.StartTime)
 		}
 	}()
 

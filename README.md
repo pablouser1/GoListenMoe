@@ -8,14 +8,15 @@ go get && go build .
 
 ## How to use
 ```bash
-./GoListenMoe -f jpop # (or kpop)
+./GoListenMoe [-f] [-p mpv,native] jpop # (or kpop)
 ```
 
-* -f: Forces fallback mode, currently required to work
+* -f: Forces fallback mode, currently required for native to work properly
+* -p: Player to use, options are: native, mpv
 
 ## TODO
 * Improve UI
-* Play Vorbis correctly (right now using fallback stream)
+* Play Vorbis correctly in native (right now using fallback stream)
 * Hot-swapping between JPop and Kpop
 
 ## External libraries used

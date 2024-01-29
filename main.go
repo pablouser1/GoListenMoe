@@ -5,13 +5,13 @@ import (
 	"fmt"
 
 	"github.com/pablouser1/GoListenMoe/helpers"
-	"github.com/pablouser1/GoListenMoe/player/socket"
-	"github.com/pablouser1/GoListenMoe/player/stream"
+	"github.com/pablouser1/GoListenMoe/socket"
 	"github.com/pablouser1/GoListenMoe/ui"
 )
 
 func main() {
 	fallback := flag.Bool("f", false, "Use fallback MP3")
+	player := flag.String("p", "native", "Player to use")
 	flag.Parse()
 
 	genreStr := "jpop"
@@ -34,7 +34,7 @@ func main() {
 		return
 	}
 
-	err = stream.Start(genre, *fallback)
+	playerStop, err := helpers.StartPlayer(*player, genre, *fallback)
 
 	if err != nil {
 		fmt.Println(err)
@@ -45,6 +45,6 @@ func main() {
 	ui.Cli(playing)
 
 	// Cleanup
-	stream.Stop()
 	socket.Stop()
+	playerStop()
 }

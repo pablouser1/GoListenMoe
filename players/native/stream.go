@@ -1,4 +1,4 @@
-package stream
+package native
 
 import (
 	"io"
@@ -15,7 +15,7 @@ import (
 
 var streamer beep.StreamSeekCloser
 
-func Start(genre models.Genre, fallback bool) error {
+func Start(genre models.Genre, fallback bool) (func(), error) {
 	var stream string
 	var decoder func(rc io.ReadCloser) (s beep.StreamSeekCloser, format beep.Format, err error)
 
@@ -33,7 +33,7 @@ func Start(genre models.Genre, fallback bool) error {
 	// Get HTTP Stream
 	res, err := http.Get(stream)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// Decode http body
@@ -41,14 +41,14 @@ func Start(genre models.Genre, fallback bool) error {
 	streamer, format, err = decoder(res.Body)
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// Start audio stream
 	speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
 	speaker.Play(streamer)
 
-	return nil
+	return Stop, nil
 }
 
 func Stop() {
