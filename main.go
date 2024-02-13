@@ -27,6 +27,8 @@ func main() {
 		return
 	}
 
+	action := make(chan uint8)
+
 	playing, err := socket.Start(genre.Socket)
 
 	if err != nil {
@@ -34,17 +36,17 @@ func main() {
 		return
 	}
 
-	playerStop, err := helpers.StartPlayer(*player, genre, *fallback)
+	err = helpers.InitPlayer(*player, genre, *fallback, action)
 
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	// Blocking function, shows the UI
-	ui.Cli(playing)
+	ui.Cli(playing, action)
 
 	// Cleanup
 	socket.Stop()
-	playerStop()
+
+	fmt.Println("Bye!")
 }

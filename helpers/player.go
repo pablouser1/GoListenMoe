@@ -8,19 +8,17 @@ import (
 	"github.com/pablouser1/GoListenMoe/players/native"
 )
 
-func StartPlayer(p string, genre models.Genre, fallback bool) (func(), error) {
-	var stop func()
-	var err error
+func InitPlayer(p string, genre models.Genre, fallback bool, action chan uint8) error {
+	var err error = nil
 
 	switch p {
 	case "native":
-		stop, err = native.Start(genre, fallback)
+		native.Init(genre, fallback, action)
 	case "mpv":
-		stop, err = mpv.Start(genre, fallback)
+		mpv.Init(genre, fallback, action)
 	default:
-		stop = nil
 		err = fmt.Errorf("invalid player")
 	}
 
-	return stop, err
+	return err
 }

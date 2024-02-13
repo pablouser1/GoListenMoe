@@ -1,13 +1,15 @@
 package ui
 
 import (
+	"bufio"
 	"fmt"
 	"math"
 	"os"
-	"os/signal"
 	"strconv"
+	"strings"
 	"time"
 
+	"github.com/pablouser1/GoListenMoe/constants/enums"
 	"github.com/pablouser1/GoListenMoe/models"
 )
 
@@ -49,10 +51,7 @@ func writeToScreen(now models.Song, last models.Song, listeners int64, start str
 	fmt.Println("Listeners: " + strconv.FormatInt(listeners, 10))
 }
 
-func Cli(playing chan models.PlayingData) {
-	interrupt := make(chan os.Signal, 1)
-	signal.Notify(interrupt, os.Interrupt)
-
+func Cli(playing chan models.PlayingData, action chan uint8) {
 	go func() {
 		for {
 			now := <-playing
@@ -60,5 +59,30 @@ func Cli(playing chan models.PlayingData) {
 		}
 	}()
 
-	<-interrupt
+	// Start playing
+	action <- enums.ACTION_PLAY
+
+	running := true
+	reader := bufio.NewReader(os.Stdin)
+	for running {
+		aTmp, _ := reader.ReadString('\n')
+		a := strings.TrimRight(aTmp, "\n")
+
+		switch a {
+		case "p":
+			action <- enums.ACTION_TOGGLE
+		case "+":
+			action <- enums.ACTION_VOLUME_UP
+		case "-":
+			action <- enums.ACTION_VOLUME_DOWN
+		case "m":
+			action <- enums.ACTION_VOLUME_MUTE
+		case "q":
+			action <- enums.ACTION_STOP
+			running = false
+		}
+
+		// Remove that line
+		fmt.Printf("\033[1A\033[K")
+	}
 }

@@ -18,6 +18,7 @@ go get && go build .
 * Improve UI
 * Play Vorbis correctly in native (right now using fallback stream)
 * Hot-swapping between JPop and Kpop
+* Add compability for Windows when using mpv
 
 ## External libraries used
 * Beep (https://github.com/faiface/beep)
